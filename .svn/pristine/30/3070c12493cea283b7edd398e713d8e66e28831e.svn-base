@@ -1,0 +1,6 @@
+$(function(){
+	$("#main").niceScroll({
+      cursorcolor: "rgba(0,0,0,.2)" 
+    });
+
+});

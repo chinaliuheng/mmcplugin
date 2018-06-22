@@ -1,0 +1,72 @@
+var ch = 0;
+var domain = "";
+//监听消息 model + view
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	var container = '<div id="coupertcontainer"  style="width:461px;position:fixed;top:15px;right:15px;height:621px;background-color:#fff;z-index:2147483647;box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 6px;"></div>';
+	var ifm = '<div class="myheader" style="cursor:move;height:5.5%;width:461px;background-color:rgb(12, 183, 84);"><div style="width:90px;height:100%;float:left;"><p style="color:white;margin-top:5px;margin-left:5px;">MMC Edit</p></div><div style="width:20px;height:100%;float:right;"><p style="margin-top:5px;font-size:19px;cursor:pointer;color:white;" id="myclose">X</p></div></div><div class="allbox" id="allboxcontainer" style="height:94.5%;margin-bottom:0px;"><input type="hidden" name="coupertfrmshow" id="coupertfrmshow" value="0"><iframe src="chrome-extension://'+getExtensionID()+'/editor.html" id="frm" style="display:block;width:461px;height:583px;padding:0px;border:none;" frameborder="0" scrolling="no"></div>';
+	if(request.action=='popAdd'){
+
+		ch = setInterval(function(){
+			console.log('starting...');
+			console.log('checking...');
+			if($("#coupertcontainer").length<1){
+				console.log('found...');
+				$('body').after(container);
+				$("#coupertcontainer").html(ifm);
+				clearInterval(ch);
+
+				$('#myclose').click(function(){
+					$("#coupertcontainer").hide();
+					$("#coupertfrmshow").val('1');
+				});
+
+				$('#coupertcontainer').each(function(index){
+					$(this).myDrag({
+						randomPosition:false,
+						direction:'all',
+						handler:'.myheader'
+					});
+				});
+
+
+			}
+		},1000);
+	}
+
+	if(request.action =='showPop'){
+		console.log('starting...');
+		console.log('checking...');
+		if($("#coupertcontainer").length<1){
+
+			$('body').after(container);
+			$("#coupertcontainer").html(ifm);
+			$('#myclose').click(function(){
+				$("#coupertcontainer").hide();
+				$("#coupertfrmshow").val('1');
+			});
+			
+			$('#coupertcontainer').each(function(index){
+				$(this).myDrag({
+					randomPosition:false,
+					direction:'all',
+					handler:'.myheader'
+				});
+			});
+
+		}else{
+			if($("#coupertfrmshow").val()=='1'){
+				$("#coupertcontainer").show();
+				$("#coupertfrmshow").val('0');
+			}else{
+				$("#coupertcontainer").hide();
+				$("#coupertfrmshow").val('1');
+			}
+		}	
+
+	}
+
+});
+
+function getExtensionID() {
+    return chrome.runtime && chrome.runtime.id ? chrome.runtime.id: chrome.i18n.getMessage("@@extension_id");
+}

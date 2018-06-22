@@ -1,0 +1,95 @@
+var domain = "";
+
+//浏览器加载完成
+chrome.tabs.onUpdated.addListener(onUpdated);
+
+function onUpdated(tabId, details, tab) {
+    if ('loading' == (details || {}).status  || 'complete' == (details || {}).status){
+    	var url = tab.url;
+    	domain = get_domain_from_url(url);
+    	setTimeout(function(){
+    		chrome.tabs.sendMessage(tabId, {action:"popAdd",domain:domain},function(response) {
+                  });
+    	},2000);
+        return;
+    }
+
+}
+
+//图标点击事件
+
+chrome.browserAction.onClicked.addListener(onClicked);
+
+
+function onClicked(tabId){
+    chrome.tabs.query(
+        {active: true, currentWindow: true}, 
+        function(tabId) {
+        	chrome.tabs.sendMessage(tabId[0].id, {action:"showPop",domain:domain}, function(response) {});
+     });
+}
+
+
+function get_domain_from_url(url) {
+    try {
+        if (url == null)
+            return '';
+        var host = url.split('/');
+        if (host.length < 3)
+            return '';
+        var domain = host[2];
+        if (domain.indexOf("www.") == 0)
+            domain = domain.substr(4);
+        return domain;
+
+    } catch (e) {
+        return '';
+    }
+}
+
+
+//监听 controller view 消息
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+
+	if(request.action=='needpopAdd'){
+		// chrome.tabs.sendMessage(tabId, {action:"popAdd"},function(response) {
+                  //});
+		// console.log("消息调用:",'controller needdata');
+	    sendResponse({action:"popAdd",data:'from model'});
+	}
+
+	if(request.action=='test'){
+		sendResponse({action:"testcallback",data:'from model'});
+	}
+
+});
+
+
+//getDomainMMC
+function getDomainMMC(domain,callback){
+	var apiurl = "https://go.soarinfotech.com/api.php?action=getDomainMMC&domain="+domain;
+	ajaxApi(apiurl,{},function(resp){
+		callback(resp);
+	});
+}
+
+
+function ajaxApi(url,params={},callback){
+	var type = params?'post':'get';
+	$.ajax({
+		type:type,
+		url:url+addedParams(),
+		data:params,
+		dataType:"json",
+		success:function(resp){
+			callback(resp);
+		}
+	});
+}
+
+function addedParams(){
+	var token = localStorage.get('token');
+	var user = localStorage.get('user');
+	var str = "&token="+token+"&user="+user;
+	return str;
+}

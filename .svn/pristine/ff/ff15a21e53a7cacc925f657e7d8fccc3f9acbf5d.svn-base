@@ -1,0 +1,124 @@
+var tabid = getQueryString('tabid');
+var domain = getQueryString('domain');
+var cur_url = getQueryString('cur_url');
+var data = null;
+var cur_mer = null;
+var all_site = [];
+var cur_mer_id = null;
+var cur_site = null;
+$(function(){
+	chrome.extension.getBackgroundPage().getDomainMMC(tabid,domain).then(function(resp){
+
+		if(resp.code == 0){
+			data = resp.data;
+			cur_mer = data[0];
+			console.log(cur_mer);
+			cur_mer_id = cur_mer.ID;
+			cur_site = cur_mer.Site;
+			var sl_str = "";
+			$(data).each(function(index,item){
+				all_site.push(item.Site);
+				sl_str += "<option value='"+item.Site+"'>"+item.Site+"</option>";
+			});
+			$("#site_list").html(sl_str);
+			selectMerchant(cur_mer_id,cur_site);
+
+		}
+
+		if(resp.code==-2){
+			chrome.extension.getBackgroundPage().cacheWorker('del','user');
+			chrome.extension.getBackgroundPage().cacheWorker('del','token');
+			alert('login expired!');
+			sendToController('refreshwd',function(resp){});
+		}
+
+	});
+
+	$("#site_list").change(function(){
+		var site = $(this).val();
+		$(data).each(function(index,item){
+			if(item.Site == site){
+				cur_mer = item;
+				return false;
+			}
+		});
+		cur_mer_id = cur_mer.ID;
+		cur_site = cur_mer.Site;
+		selectMerchant(cur_mer_id,cur_site);
+	});
+
+	$("#clearinput").click(function(){
+		$("#title").val('');
+		$("#code").val('');
+		$("#desc").val('');
+		$("#end_time").val('');
+	});
+
+});
+
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+
+function selectMerchant(cur_mer_id,cur_site){
+
+	$("#merchant_name").html(cur_mer.Name);
+	var stats_str = "AllowCoupon:"+cur_mer.Status[0].AllowCoupon+"<br/>"+"AllowNonAffCoupon:"+cur_mer.Status[0].AllowNonAffCoupon+"<br/>"+"AllowNonAffPromo:"+cur_mer.Status[0].AllowNonAffPromo;
+	$("#merchant_status").html(stats_str);
+	$("#merchant_tips").html(cur_mer.tips);
+	$("#merchant_domain").html(cur_mer.OriginalUrl);
+	$("#landing_page").val(decodeURI(cur_url));
+
+	chrome.extension.getBackgroundPage().getMerchantCode(cur_mer_id,cur_site).then(function(resp){
+		if(resp.code==0 && resp.data.length >0 ){
+			var tb1_str="";
+			var tb2_str="";
+			var tb3_str="";
+			var tb4_str="";
+
+			$(resp.data).each(function(index,item){
+				//console.log(item.Title,222);
+				if(item.Code.toString().length>0){
+					var code = " - Code: <span style='color:red;'>"+item.Code.toString()+"</span>";
+				}else{
+					var code = "";
+				}
+				if(code){
+					tb2_str += "<p>Title: "+ item.Title.toString() + code + " ExpireTime: <span style='color:red;'>"+item.ExpireTime.toString() +"</span></p>";
+				}else{
+					tb3_str += "<p>Title: "+ item.Title.toString() + code + " ExpireTime: <span style='color:red;'>"+item.ExpireTime.toString() + "</span></p>";
+				}
+
+				if(item.type_2.indexOf('shipping')!=-1){
+					tb4_str += "<p>Title: "+ item.Title.toString() + code + " ExpireTime: <span style='color:red;'>"+item.ExpireTime.toString() + "</span></p>";
+				}
+
+				tb1_str += "<p>Title: "+ item.Title.toString() + code + " ExpireTime: <span style='color:red;'>"+item.ExpireTime.toString() + "</span></p>";
+				//console.log(tb1_str);
+			});
+
+			$("#block1").html(tb1_str);
+			$("#block2").html(tb2_str);
+			$("#block3").html(tb3_str);
+			$("#block4").html(tb4_str);
+		}
+	});
+
+}
+
+//发送消息 控制器
+function sendToController(action,callback){
+	//发送消息并且回调
+	chrome.tabs.getSelected(null, function(tab) {
+      chrome.tabs.sendRequest(tab.id, {action: action},
+        function(response) {
+        	callback(response);
+        });
+    });
+}

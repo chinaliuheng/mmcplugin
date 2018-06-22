@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>edit</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Google Web Fonts -->
+    
+    <link rel="stylesheet" href="css/sm.css">
+    <link rel="stylesheet" href="css/sm-extend.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <script src="js/zepto.js"></script>
+    <script src="js/config.js"></script>
+    <style type="text/css">
+      .page-group{
+        background: #fff;
+      }
+      .content-block{
+        padding:0 5px;
+        color: #000;
+      }
+      .list-block {
+        font-size: 10px;
+        margin: 0 0;
+      }
+      .col-50{
+        width: 10%;
+      }
+      input{
+        font-size: 10px;
+      }
+      .list-block .item-title.label{
+        width: 25%;
+      }
+      .buttons-tab .button{
+        font-size: 0.5rem;
+      }
+      .list-block textarea{
+        height: 3rem;
+      }
+      body, a, p, table, td, th, tr, p, form, li, h1, h2, h3, select, button, span {
+          font-size: 12px;
+          font-family: Tahoma,Helvetica,Arial,Sans-Serif;
+          line-height: 100%;
+          color: #333333;
+      }
+
+      div{margin:-4 auto} 
+    </style>
+  </head>
+  <body>
+    <div class="page-group">
+    <div id="page-layout" class="page">
+
+  <div class="content" id="main" style="font-size:12px;">
+    <div class="list-block">
+      <ul>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Site</div>
+              <div class="item-input">
+                <select id="site_list">
+                </select>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Merchant Name</div>
+              <div class="item-input label" id="merchant_name">
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Domain</div>
+              <div class="item-input label" id="merchant_domain">
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Status</div>
+              <div class="item-input label" id="merchant_status"> 
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Merchant Tips</div>
+              <div class="item-input label" id="merchant_tips"> 
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Landing page</div>
+              <div class="item-input">
+                <input type="text" placeholder="landing page" id="landing_page" value="">
+                <span id="merchant_url_hidden" style="color: red"></span>
+                <!-- <input type="hidden" id="expire_flag_hidden" name="expire_flag_hidden" value="1" /> -->
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Code</div>
+              <div class="item-input">
+                <input type="text" placeholder="" class="" id="code" value="">
+                <span id="checkcouponcode" name="checkcouponcode" style="color: red"></span>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Title</div>
+              <div class="item-input">
+                <input type="text" placeholder="please input title" id="title">
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Description</div>
+              <div class="item-input">
+                <input type="text" id="desc" placeholder="please input description">
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title label">Expiration</div>
+              <div class="item-input">
+                <input type="date" value="" id="end_time" style="width: 80%;"/>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="content-block">
+      <div class="row">
+        <div class="col-50"><a href="#" id="addcoupon" class="button button-big button-fill button-success">+Coupon</a></div>
+        <div class="col-50"><a href="#" id="adddeal" class="button button-big button-fill button-success">+Deal</a></div>
+        <div class="col-50"><a href="#" id="clearinput" class="button button-big button-fill button-danger" >Clear Input</a></div>
+        <div class="col-50"><a href="#" id="clearcache" class="button button-big button-fill button-danger" >Clear Cache</a></div>
+        <!-- <div class="col-50"><a href="#" id="undo" class="button button-big button-fill button-danger" >Undo</a></div> -->
+      </div>
+    </div>
+    <div class="content-block">
+      <div class="buttons-tab">
+        <a href="#tab1" class="tab-link active button">All</a>
+        <a href="#tab2" class="tab-link button">Coupon</a>
+        <a href="#tab3" class="tab-link button">Deal</a>
+        <a href="#tab4" class="tab-link button">Free Shipping</a>
+      </div>
+      <div class="tabs">
+
+        <div id="tab1" class="tab active">
+          <div class="content-block" id="block1">
+          </div>
+        </div>
+
+        <div id="tab2" class="tab">
+          <div class="content-block" id="block2">
+          </div>
+        </div>
+
+        <div id="tab3" class="tab">
+          <div class="content-block" id="block3">
+          </div>
+        </div>
+
+        <div id="tab4" class="tab">
+          <div class="content-block" id="block4">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="jquery-1.12.0.min.js"></script>
+    <script src="js/sm.js"></script>
+    <script src="js/sm-extend.js"></script>
+    <script src="js/sm-city-picker.js"></script>
+    <script src="js/editor.js"></script>
+  </body>
+</html>
