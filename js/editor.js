@@ -22,6 +22,9 @@ $(function(){
 				all_site.push(item.Site);
 				sl_str += "<option value='"+item.Site+"'>"+item.Site+"</option>";
 			});
+			if(data.length>1){
+				$('#sitetitle').html("Site" + "&nbsp;&nbsp;<span style='color:red'>(Multi)</span>")
+			}
 			$("#site_list").html(sl_str);
 			selectMerchant(cur_mer_id,cur_site);
 
