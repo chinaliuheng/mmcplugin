@@ -74,26 +74,81 @@ $(function(){
 		$('#checkcouponcode').html('');
 		if(code != ''){
 			chrome.extension.getBackgroundPage().checkCodeInfo(cur_mer_id,cur_site,code).then(function(response){
+
 				$('#checkcouponcode').html(response);	
+				if($('#append_source').length>0){
+					var couponid = $('#append_source').next().attr('data-couponid');
+					var append = "<button class='append' data-id='"+ couponid +"'>Append</button>";
+					$('#code').after(append);
+				}
+
 				$('#checkcouponcode a').each(function() {
-					// alert($(this).attr('href'));
 					var orgurl = 'http://task.soarinfotech.com' + $(this).attr('href');
 					$(this).attr('href', '');
-					// alert($(this).attr('href'));
-					// alert($(this));
 					$(this).attr('data-href', orgurl);
-					// alert($(this).attr('data-href'));
 					$(this).addClass('jumpbc');
-				});;
+				});
+
+				$('.jumpbc').click(function() {
+					var url = $(this).attr('data-href');
+					opennewtab(url);
+				});
+				
+				$(".append").click(function() {
+					var couponid = $(this).attr('data-id');
+					var source = 'mmc|Merchant';
+					var sourceid = '';
+					var r = confirm('Are you sure to append '+ source +'?');
+					if(r == false){
+						return false;
+					}else{
+						if(cur_site != '' && couponid != '' && cur_mer_id != ''){
+							chrome.extension.getBackgroundPage().appnedsource(sourceid, cur_mer_id, source, couponid, cur_site).then(function(response){
+								if(response == 'success'){
+									alert('append ' + source + ' to ' + cur_site + '|' + couponid);
+								}
+							});
+						}
+					}
+				});
+			});
+		}
+	});
+	// title check
+	$("#title").focusout(function(){
+		var title = $(this).val();
+		if(title != ''){
+			//title unique check
+			chrome.extension.getBackgroundPage().checkTitleInfo(cur_mer_id,cur_site, title).then(function(response){
+				if(response.error == 0) {
+					var title = response.data[0]['Title'];
+					var coupon_id = response.data[0]['ID'];
+					var merchant_url = '/editor/coupon_list.php?site='+ cur_site + '&search_query=' +coupon_id;
+
+					merchant_url = 'http://task.soarinfotech.com' + merchant_url;
+
+					$('#title_hidden').html('Current Title is already exist ;The title is &nbsp;<a class="jumpbc" data-href="'+ merchant_url +'">'+ title +'</a><br/>');
+				}else {
+					$('#title_hidden').html('');
+				}
 				$('.jumpbc').click(function() {
 					var url = $(this).attr('data-href');
 					opennewtab(url);
 				});
 			});
+			// bk check
+			chrome.extension.getBackgroundPage().checkBlackKeyWord(title, cur_site, cur_mer_id).then(function(result){
+				if(result.status == 'success') {
+					$("#blackmsg").show();
+					$("#blackmsg").html(result.rectedCode);
+				}else{
+					$("#blackmsg").hide();
+				}
+			});
 		}
-		
 	});
 
+	//landing page check
 	$("#landing_page").focusout(function(){
 		var checkLpInfo = $(this).val();
 		if(checkLpInfo != '' && $("#code").val() == ''){
@@ -101,10 +156,6 @@ $(function(){
 				if(response.error == 0) {
 					var title = response.data[0]['Title'];
 					var coupon_id = response.data[0]['ID'];
-					// alert(title);
-					// var merchant_url = 'http://autopublish:autopublish123456@task.soarinfotech.com/editor/coupon_list.php?site='+ site + '&search_query=' +coupon_id;
-
-					// alert(merchant_url);
 					$('#merchant_url_hidden').html('<span style="color:red;">【Duplicated with Serving-请确认促销是否重复】<br>'+ title +'</span>');
 					$('#expire_flag_hidden').val(0);
 				}else {
@@ -114,15 +165,29 @@ $(function(){
 				}
 			});
 		}
-		
 	});
-	// $("#undo").click(function(event){
-
-	// 	$('#allboxcontainer').simulateKeyPress('z');
-	// 	$('#allboxcontainer').simulateKeyPress('ctrl');
-	// });
-
 });
+
+Date.prototype.format = function(format) { 
+       var date = { 
+              "M+": this.getMonth() + 1, 
+              "d+": this.getDate(), 
+              "h+": this.getHours(), 
+              "m+": this.getMinutes(), 
+              "s+": this.getSeconds(), 
+              "q+": Math.floor((this.getMonth() + 3) / 3), 
+              "S+": this.getMilliseconds() 
+       }; 
+       if (/(y+)/i.test(format)) { 
+              format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length)); 
+       } 
+       for (var k in date) { 
+              if (new RegExp("(" + k + ")").test(format)) { 
+                     format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? date[k] : ("00" + date[k]).substr(("" + date[k]).length)); 
+              } 
+       } 
+       return format; 
+} 
 
 
 function generateUrl(type){
@@ -169,10 +234,12 @@ function selectMerchant(cur_mer_id,cur_site){
 	}
 	if(stats_str == ''){
 		stats_str += "<span><b>No Result</b></span>";
+		$('#merchant_status').parent().parent().remove();		
 	}
 	$("#merchant_status").html(stats_str);
 	if(cur_mer.tips == ''){
-		$("#merchant_tips").html('<span><b>No Result</b></span>');
+		$('#merchant_tips').parent().parent().remove();
+		// $("#merchant_tips").html('<span><b>No Result</b></span>');
 	}else{
 		$("#merchant_tips").html(cur_mer.tips);
 	}
@@ -188,7 +255,6 @@ function selectMerchant(cur_mer_id,cur_site){
 			var tb4_str="";
 
 			$(resp.data).each(function(index,item){
-				//console.log(item.Title,222);
 				if(item.Code.toString().length>0){
 					if(item.Source.toString() == 'cpq|COMPETITOR'){
 						var buttonstr = '<button class="append" data-id='+ item.ID +'>+</button>';
@@ -205,7 +271,10 @@ function selectMerchant(cur_mer_id,cur_site){
 				}else{
 					var ExpireTimeType = 'Expire Time';
 				}
-				
+				item.ExpireTime = new Date(item.ExpireTime).format('yyyy-MM-dd'); 
+				if(item.ExpireTime == 'NaN-aN-aN'){
+					item.ExpireTime = '0000-00-00';
+				}
 
 				if(item.Type == 1){
 					var type = 'coupon';
@@ -227,6 +296,7 @@ function selectMerchant(cur_mer_id,cur_site){
 			$("#block2").html(tb2_str);
 			$("#block3").html(tb3_str);
 			$("#block4").html(tb4_str);
+
 			$(".showtitle").click(function() {
 				var couponid = $(this).attr('data-id');
 				var type = $(this).attr('data-type');
