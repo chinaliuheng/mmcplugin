@@ -17,7 +17,7 @@ $(function() {
         } else {
             var p = "login.html";
         }
-        var container = '<div id="coupertcontainer"  style="font-size:15px;width:461px;position:fixed;top:15px;right:15px;height:621px;background-color:#fff;z-index:2147483647;box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 6px;"></div>';
+        var container = '<div id="coupertcontainer"  style=" position:fixed;font-size:15px;width:461px;position:fixed;top:15px;right:15px;height:621px;background-color:#fff;z-index:2147483647;box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 6px;"></div>';
         var ifm = '<div class="myheader" style="cursor:move;height:5.5%;width:461px;background-color:rgb(12, 183, 84);"><div style="width:90px;height:100%;float:left;"><p style="color:white;margin-top:5px;margin-left:5px;">MMC Edit</p></div><div style="width:20px;height:100%;float:right;"><p style="margin-top:5px;font-size:19px;cursor:pointer;color:white;" id="myclose">X</p></div></div><div class="allbox" id="allboxcontainer" style="height:94.5%;margin-bottom:0px;"><input type="hidden" name="coupertfrmshow" id="coupertfrmshow" value="0"><iframe src="chrome-extension://' + getExtensionID() + '/' + p + '?tabid=' + request.tabid + '&domain=' + request.domain + '&cur_url=' + cur_url + '" id="frm" style="display:block;width:461px;height:583px;padding:0px;border:none;" frameborder="0" scrolling="no"></div>';
         if (request.action == 'popAdd') {
 
@@ -27,7 +27,7 @@ $(function() {
                 if (times > 15) {
                     return false;
                 }
-                
+
                 if ($("#coupertcontainer").length < 1) {
 
                     var kw_arr = new Array(/(?:\b)割引(?:\b)/ig,/(?:\b)割引(?:\b)/ig,/(?:\b)引き(?:\b)/ig,/(?:\b)お得(?:\b)/ig,/(?:\b)円オフ(?:\b)/ig,/(?:\b)円off(?:\b)/ig,/(?:\b)円お得(?:\b)/ig,/(?:\b)円引き(?:\b)/ig,/(?:\b)円割引円プレゼント(?:\b)/ig,/(?:\b)プレゼント(?:\b)/ig,/(?:\b)Discount(?:\b)/ig,/(?:\b)Off(?:\b)/ig,/(?:\b)Deal(?:\b)/ig,/(?:\b)Coupon(?:\b)/ig,/(?:\b)Code(?:\b)/ig,/(?:\b)Voucher(?:\b)/ig,/(?:\b)Free(?:\b)/ig,/(?:\b)Complimentary(?:\b)/ig,/(?:\b)Shipping(?:\b)/ig,/(?:\b)Click & Collect(?:\b)/ig,/(?:\b)Postage(?:\b)/ig,/(?:\b)P&P(?:\b)/ig,/(?:\b)Delivery(?:\b)/ig,/(?:\b)S&H(?:\b)/ig,/(?:\b)Return(?:\b)/ig,/(?:\b)Closeout(?:\b)/ig,/(?:\b)Clearance(?:\b)/ig,/(?:\b)Sale(?:\b)/ig,/(?:\b)Special(?:\b)/ig,/(?:\b)Offer(?:\b)/ig,/(?:\b)Promotion(?:\b)/ig,/(?:\b)Promo(?:\b)/ig,/(?:\b)Blowout(?:\b)/ig,/(?:\b)Outlet(?:\b)/ig,/(?:\b)Markdown(?:\b)/ig,/(?:\b)Sign Up(?:\b)/ig,/(?:\b)Subscribe(?:\b)/ig,/(?:\b)Subscription(?:\b)/ig,/(?:\b)Join(?:\b)/ig,/(?:\b)Refer(?:\b)/ig,/(?:\b)Gift Card(?:\b)/ig,/(?:\b)eGift Card(?:\b)/ig,/(?:\b)Gift Voucher(?:\b)/ig,/(?:\b)eGift Voucher(?:\b)/ig,/(?:\b)Gift Certificate(?:\b)/ig,/(?:\b)eGift Certificate(?:\b)/ig,/(?:\b)123123(?:\b)/ig,/(?:\b)1(?:\b)/ig,/(?:\b)2233ddd(?:\b)/i);
@@ -92,6 +92,33 @@ $(function() {
 
         }
     });
+
+    var timer;
+    $(function(){
+        $(window).scroll(function(){
+            clearInterval(timer);
+            var topScroll=getScroll();
+            var topDiv="15px";
+            //设置初始位置
+            var top= topScroll+parseInt(topDiv);
+            timer=setInterval(function(){
+                    $("#coupertcontainer").css("top", top+"px");
+                     // $("#coupertcontainer").animate({"top":top},100);
+            },10)//设置时间
+        })
+    })
+    function getScroll(){
+             var bodyTop = 0;  
+             if (typeof window.pageYOffset != 'undefined') {  
+                     bodyTop = window.pageYOffset;  
+             } else if (typeof document.compatMode != 'undefined' && document.compatMode != 'BackCompat') {  
+                     bodyTop = document.documentElement.scrollTop;  
+             }  
+             else if (typeof document.body != 'undefined') {  
+                     bodyTop = document.body.scrollTop;  
+             }  
+             return bodyTop
+    }
 
 
 });
