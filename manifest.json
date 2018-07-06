@@ -12,7 +12,7 @@
    "content_scripts": [ {
       "all_frames": false,
       "css": [ "css/style.css","css/highlight.css" ],
-      "js": ["jquery-1.12.0.min.js","selector-generator.js","highlighter.js","Tdrag.js","controller.js"],
+      "js": ["jquery-1.12.0.min.js","selector-generator.js","highlightRegex.min.js","Tdrag.js","controller.js"],
       "matches": [ "<all_urls>" ],
       "run_at": "document_end"
    } ],

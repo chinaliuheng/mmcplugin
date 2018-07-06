@@ -23,22 +23,19 @@ $(function() {
 
             ch = setInterval(function() {
                 times++;
-                console.log('starting...');
-                console.log('checking...');
+
                 if (times > 15) {
                     return false;
                 }
+                
                 if ($("#coupertcontainer").length < 1) {
 
-                    var kw_arr = [
-                        '割引', '引き', 'お得', '円オフ', '円off', '円お得', '円引き', '円割引円プレゼント', 'プレゼント', 'Discount', 'Off', 'Deal', 'Coupon', 'Code', 'Voucher', 'Free', 'Complimentary', 'Shipping', 'Click & Collect', 'Postage', 'P&P', 'Delivery', 'S&H', 'Return', 'Closeout', 'Clearance', 'Sale', 'Special', 'Offer', 'Promotion', 'Promo', 'Blowout', 'Outlet', 'Markdown', 'Sign Up', 'Subscribe', 'Subscription', 'Join', 'Refer', 'Gift Card', 'eGift Card', 'Gift Voucher', 'eGift Voucher', 'Gift Certificate', 'eGift Certificate'
-                    ];
+                    var kw_arr = new Array(/(?:\b)割引(?:\b)/ig,/(?:\b)割引(?:\b)/ig,/(?:\b)引き(?:\b)/ig,/(?:\b)お得(?:\b)/ig,/(?:\b)円オフ(?:\b)/ig,/(?:\b)円off(?:\b)/ig,/(?:\b)円お得(?:\b)/ig,/(?:\b)円引き(?:\b)/ig,/(?:\b)円割引円プレゼント(?:\b)/ig,/(?:\b)プレゼント(?:\b)/ig,/(?:\b)Discount(?:\b)/ig,/(?:\b)Off(?:\b)/ig,/(?:\b)Deal(?:\b)/ig,/(?:\b)Coupon(?:\b)/ig,/(?:\b)Code(?:\b)/ig,/(?:\b)Voucher(?:\b)/ig,/(?:\b)Free(?:\b)/ig,/(?:\b)Complimentary(?:\b)/ig,/(?:\b)Shipping(?:\b)/ig,/(?:\b)Click & Collect(?:\b)/ig,/(?:\b)Postage(?:\b)/ig,/(?:\b)P&P(?:\b)/ig,/(?:\b)Delivery(?:\b)/ig,/(?:\b)S&H(?:\b)/ig,/(?:\b)Return(?:\b)/ig,/(?:\b)Closeout(?:\b)/ig,/(?:\b)Clearance(?:\b)/ig,/(?:\b)Sale(?:\b)/ig,/(?:\b)Special(?:\b)/ig,/(?:\b)Offer(?:\b)/ig,/(?:\b)Promotion(?:\b)/ig,/(?:\b)Promo(?:\b)/ig,/(?:\b)Blowout(?:\b)/ig,/(?:\b)Outlet(?:\b)/ig,/(?:\b)Markdown(?:\b)/ig,/(?:\b)Sign Up(?:\b)/ig,/(?:\b)Subscribe(?:\b)/ig,/(?:\b)Subscription(?:\b)/ig,/(?:\b)Join(?:\b)/ig,/(?:\b)Refer(?:\b)/ig,/(?:\b)Gift Card(?:\b)/ig,/(?:\b)eGift Card(?:\b)/ig,/(?:\b)Gift Voucher(?:\b)/ig,/(?:\b)eGift Voucher(?:\b)/ig,/(?:\b)Gift Certificate(?:\b)/ig,/(?:\b)eGift Certificate(?:\b)/ig,/(?:\b)123123(?:\b)/ig,/(?:\b)1(?:\b)/ig,/(?:\b)2233ddd(?:\b)/i);
 
                     $(kw_arr).each(function(index, item) {
-                        $('body').highlight(item);
+                        $('body').highlightRegex(item);
                     });
 
-                    console.log('found...');
                     $('body').after(container);
                     $("#coupertcontainer").html(ifm);
                     clearInterval(ch);
