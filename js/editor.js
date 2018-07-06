@@ -78,7 +78,8 @@ $(function(){
 		if(code != ''){
 			chrome.extension.getBackgroundPage().checkCodeInfo(cur_mer_id,cur_site,code).then(function(response){
 
-				$('#checkcouponcode').html(response);	
+				$('#checkcouponcode').html(response);
+				$('#code').after('');
 				if($('#append_source').length>0){
 					if($('#appendbutton').length>0){
 						append = '';
@@ -87,6 +88,8 @@ $(function(){
 						var append = "<button class='append' id='appendbutton' data-id='"+ couponid +"'>Append</button>";
 					}
 					$('#code').after(append);
+				}else{
+					$('#appendbutton').remove();
 				}
 
 				$('#checkcouponcode a').each(function() {
