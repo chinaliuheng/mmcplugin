@@ -80,8 +80,12 @@ $(function(){
 
 				$('#checkcouponcode').html(response);	
 				if($('#append_source').length>0){
-					var couponid = $('#append_source').next().attr('data-couponid');
-					var append = "<button class='append' data-id='"+ couponid +"'>Append</button>";
+					if($('#appendbutton').length>0){
+						append = '';
+					}else{
+						var couponid = $('#append_source').next().attr('data-couponid');
+						var append = "<button class='append' id='appendbutton' data-id='"+ couponid +"'>Append</button>";
+					}
 					$('#code').after(append);
 				}
 
