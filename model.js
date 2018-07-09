@@ -137,10 +137,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         sendResponse({ action: "popAdd", data: 'from model' });
     }
 
-    if (request.action == 'test') {
-        sendResponse({ action: "testcallback", data: 'from model' });
+    if (request.action == 'getHllist') {
+        getHighLight('mmc').then(function(res){
+            if(res.code == 0){
+                sendResponse({data: res.data});
+            }else{
+                console.log('no hightlight words');
+            }
+        });
+        return true;
     }
-
 });
 
 
