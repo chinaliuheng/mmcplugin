@@ -135,7 +135,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         //});
         // console.log("消息调用:",'controller needdata');
         sendResponse({ action: "popAdd", data: 'from model' });
-        sendResponse({ action: "gethllist", data: 'from model' });
     }
 
     if (request.action == 'test') {
