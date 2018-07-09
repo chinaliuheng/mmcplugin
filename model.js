@@ -173,14 +173,14 @@ function getMerchantCode(merchantid, site) {
 function checkCodeInfo(merchantid, site, code) {
     var username = cacheWorker('get', 'user');
     var token = base.decode(cacheWorker('get', 'token'));
-    var apiurl = "http://" + username + ":" + token + "@task.soarinfotech.com/editor/coupon_search.php?action=rsynch-chk-couponcode&couponcode=" + encodeURI(code) + "&merchantid=" + merchantid + "&site=" + site;
+    var apiurl = "http://" + encodeURIComponent(username) + ":" + encodeURIComponent(token) + "@task.soarinfotech.com/editor/coupon_search.php?action=rsynch-chk-couponcode&couponcode=" + encodeURI(code) + "&merchantid=" + merchantid + "&site=" + site;
     return ajaxApi(apiurl, '', null, 'text');
 }
 
 function checkLpInfo(merchantid, site, lpurl) {
     var username = cacheWorker('get', 'user');
     var token = base.decode(cacheWorker('get', 'token'));
-    var apiurl = "http://" + username + ":" + token + "@task.soarinfotech.com/editor/promo.php?site=" + site + "&action=checkMerchantPromotionUnique&type=deal&merchant=" + merchantid;
+    var apiurl = "http://" + encodeURIComponent(username) + ":" + encodeURIComponent(token) + "@task.soarinfotech.com/editor/promo.php?site=" + site + "&action=checkMerchantPromotionUnique&type=deal&merchant=" + merchantid;
     return ajaxApi(apiurl, '', { promotion_url: lpurl });
 }
 
