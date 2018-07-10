@@ -7,14 +7,30 @@ chrome.tabs.onUpdated.addListener(onUpdated);
 
 function onUpdated(tabId, details, tab) {
     if ('loading' == (details || {}).status || 'complete' == (details || {}).status) {
+        var reload = false;
         var url = tab.url;
 
         if(url.indexOf('action=doadd')!=-1 && 'complete' == (details || {}).status){
             setTimeout(function(){
                 chrome.tabs.remove(tabId,function(){});
             },1000);
-            return;
+            reload = true;
+            // return;
         }
+
+        if(reload){
+            chrome.tabs.getAllInWindow(function(alltabs){
+                $(alltabs).each(function(index, tab) {
+                    var url_choose = tab.url
+                    var tabId_choose = tab.id
+                    if(url_choose.indexOf('coupon_list.php') != -1 && url_choose.indexOf('action=couponlist') != -1 && url_choose.indexOf('from1=mmc') != -1){
+                        chrome.tabs.update(tabId_choose,{highlighted: true});
+                        chrome.tabs.reload(tabId_choose,function(){});
+                        return;            
+                    }
+                });
+            });
+        }    
 
         domain = get_domain_from_url(url);
         if (checkCache()) {
