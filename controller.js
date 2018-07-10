@@ -1,6 +1,7 @@
 var ch = 0;
 var domain = "";
 var times = 0;
+var hllock = false;
 
 //监听消息 model + view
 $(function() {
@@ -17,7 +18,7 @@ $(function() {
         } else {
             var p = "login.html";
         }
-        var container = '<div id="coupertcontainer"  style=" position:fixed;font-size:15px;width:461px;position:fixed;top:15px;right:15px;height:621px;background-color:#fff;z-index:2147483647;box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 6px;"></div>';
+        var container = '<div id="coupertcontainer"  style=" position:fixed;font-size:15px;width:461px;position:fixed;top:15px;right:15px;height:621px;background-color:#fff;z-index:999999999999;box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 6px;"></div>';
         var ifm = '<div class="myheader" style="cursor:move;height:5.5%;width:461px;background-color:rgb(12, 183, 84);"><div style="width:90px;height:100%;float:left;"><p style="color:white;margin-top:5px;margin-left:5px;">MMC Edit</p></div><div style="width:20px;height:100%;float:right;"><p style="margin-top:5px;font-size:19px;cursor:pointer;color:white;" id="myclose">X</p></div></div><div class="allbox" id="allboxcontainer" style="height:94.5%;margin-bottom:0px;"><input type="hidden" name="coupertfrmshow" id="coupertfrmshow" value="0"><iframe src="chrome-extension://' + getExtensionID() + '/' + p + '?tabid=' + request.tabid + '&domain=' + request.domain + '&cur_url=' + cur_url + '" id="frm" style="display:block;width:461px;height:583px;padding:0px;border:none;" frameborder="0" scrolling="no"></div>';
         if (request.action == 'popAdd') {
 
@@ -30,13 +31,6 @@ $(function() {
 
                 if ($("#coupertcontainer").length < 1) {
 
-                    chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-
-                        var kw_arr = response.data;
-                        $(kw_arr).each(function(index, item) {
-                            $('body').highlightRegex(item);
-                        });
-                    });
 
                     $('body').after(container);
                     $("#coupertcontainer").html(ifm);
@@ -47,11 +41,24 @@ $(function() {
                         $("#coupertfrmshow").val('1');
                     });
                     $('#coupertcontainer').Tdrag();
+                    
                 }
 
             }, 1000);
         }
-
+        // console.log(hllock);
+        if(hllock === false){
+            chrome.runtime.sendMessage({action:"getHllist"}, function(response){
+                var kw_arr = response.data;
+                if(kw_arr.length>0){
+                    $(kw_arr).each(function(index, item) {
+                        var pattern = '(\\b)' + item + '(\\b)';
+                        $('body').highlightRegex(pattern);
+                    });
+                    hllock = true;
+                }
+            });
+        }        
         if (request.action == 'showPop') {
 
             // console.log('starting...');
@@ -99,12 +106,13 @@ $(function() {
     $(function(){
         $(window).scroll(function(){
             clearInterval(timer);
-            var topScroll=getScroll();
-            var topDiv="15px";
+            var topScroll= getScroll();
+            var topDiv="30px";
             //设置初始位置
-            var top= topScroll+parseInt(topDiv);
+            var top= topScroll + parseInt(topDiv);
             timer=setInterval(function(){
                     $("#coupertcontainer").css("top", top+"px");
+                    $("#coupertcontainer").css("z-index", 999999999999);
                      // $("#coupertcontainer").animate({"top":top},100);
             },10)//设置时间
         })

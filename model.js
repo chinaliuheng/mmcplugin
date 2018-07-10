@@ -1,5 +1,6 @@
 var domain = "";
 var tabid = "";
+var hllock = false;
 var base = new Base64();
 //浏览器加载完成
 chrome.tabs.onUpdated.addListener(onUpdated);
@@ -30,15 +31,6 @@ function onUpdated(tabId, details, tab) {
             }
 
         });
-        getHighLight('mmc').then(function(resp) {
-            if ((resp.code == 0 && resp.data.length > 0) || resp.code == -2) {
-                    chrome.tabs.sendMessage(tabId, { action: "gethllist", tabid: tabId}, function(response) {});
-            } else {
-                console.log('no highlight words...');
-            }
-
-        });
-        return;
     }
 
 }
@@ -138,14 +130,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if (request.action == 'getHllist') {
-        getHighLight('mmc').then(function(res){
-            if(res.code == 0){
-                sendResponse({data: res.data});
-            }else{
-                console.log('no hightlight words');
-            }
-        });
-        return true;
+        if(hllock === false){
+            console.log(hllock);
+            getHighLight('mmc').then(function(res){
+                if(res.code == 0){
+                    sendResponse({data: res.data});
+                    hllock = true;
+                }else{
+                    console.log('no hightlight words');
+                }
+            });
+            return true;
+        }
     }
 });
 
@@ -216,7 +212,6 @@ function ajaxApi(url, cache_name = '', params = null, returntype = 'json') {
                 data: params,
                 dataType: returntype,
                 success: function(resp) {
-                    console.log(type);
                     if (type == 'get' && resp.code == 0 && resp.data.length > 0) {
                         cacheWorker('set', cache_name, JSON.stringify(resp));
                         var keys = cacheWorker('get', 'allkeys');
