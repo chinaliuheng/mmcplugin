@@ -42,27 +42,23 @@ $(function() {
                     });
                     $('#coupertcontainer').Tdrag();
                     
+                    chrome.runtime.sendMessage({action:"getHllist"}, function(response){
+                        if(response.data.length > 0){
+
+                            var kw_arr = response.data;
+                            $(kw_arr).each(function(index, item) {
+                                var pattern = '(\\b)' + item + '(\\b)';
+                                console.log(pattern);
+                                $('body').highlightRegex(pattern);
+
+                            });
+                        }
+                    });
                 }
 
-            }, 1000);
+            }, 50);
         }
-        // console.log(hllock);
-        // if(hllock === false){
-            chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-                console.log(response);
-                if(response.length > 0){
 
-                    var kw_arr = response.data;
-                    // if(kw_arr.length>0){
-                        $(kw_arr).each(function(index, item) {
-                            var pattern = '(\\b)' + item + '(\\b)';
-                            $('body').highlightRegex(pattern);
-                        });
-                        hllock = true;
-                    // }
-                }
-            });
-        // }        
         if (request.action == 'showPop') {
 
             // console.log('starting...');

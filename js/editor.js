@@ -209,8 +209,8 @@ function generateUrl(type){
 			+"action=add&"
 			+"type="+type+"&"
 			+"select_source=mmc|Merchant&"
-			+"title="+encodeURI($("#title").val())+"&"
-			+"couponCode="+encodeURI($("#code").val())+"&"
+			+"title="+ encodeURIComponent($("#title").val().toString())+"&"
+			+"couponCode="+encodeURIComponent($("#code").val().toString())+"&"
 			+"merchant="+cur_mer_id+"&"
 			+"fill=&";
 		if($("#end_time").val()!=""){
@@ -218,7 +218,7 @@ function generateUrl(type){
 		}else{
 			url += "showmerlist=-1&from=couponlist&expire_type=Unknown";
 		}
-		url	+= "description=" + encodeURI($("#desc").val())+"&c_dst_url="+encodeURI($("#landing_page").val());
+		url	+= "description=" + encodeURIComponent($("#desc").val())+"&c_dst_url="+encodeURIComponent($("#landing_page").val());
 	return url;
 }
 

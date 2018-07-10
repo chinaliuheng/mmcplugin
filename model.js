@@ -1,6 +1,5 @@
 var domain = "";
 var tabid = "";
-var hllock = false;
 var base = new Base64();
 //浏览器加载完成
 chrome.tabs.onUpdated.addListener(onUpdated);
@@ -137,7 +136,7 @@ function get_domain_from_url(url) {
 
 //监听 controller view 消息
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-
+    var hllock = false;
     if (request.action == 'needpopAdd') {
         // chrome.tabs.sendMessage(tabId, {action:"popAdd"},function(response) {
         //});
@@ -147,14 +146,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
     if (request.action == 'getHllist') {
         if(hllock === false){
-            console.log(hllock);
             getHighLight('mmc').then(function(res){
                 if(res.code == 0){
                     sendResponse({data: res.data});
-                    hllock = true;
                 }else{
                     console.log('no hightlight words');
                 }
+                hllock = true;
             });
             return true;
         }
