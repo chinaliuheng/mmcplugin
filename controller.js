@@ -47,18 +47,22 @@ $(function() {
             }, 1000);
         }
         // console.log(hllock);
-        if(hllock === false){
+        // if(hllock === false){
             chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-                var kw_arr = response.data;
-                if(kw_arr.length>0){
-                    $(kw_arr).each(function(index, item) {
-                        var pattern = '(\\b)' + item + '(\\b)';
-                        $('body').highlightRegex(pattern);
-                    });
-                    hllock = true;
+                console.log(response);
+                if(response.length > 0){
+
+                    var kw_arr = response.data;
+                    // if(kw_arr.length>0){
+                        $(kw_arr).each(function(index, item) {
+                            var pattern = '(\\b)' + item + '(\\b)';
+                            $('body').highlightRegex(pattern);
+                        });
+                        hllock = true;
+                    // }
                 }
             });
-        }        
+        // }        
         if (request.action == 'showPop') {
 
             // console.log('starting...');
@@ -103,20 +107,25 @@ $(function() {
     });
 
     var timer;
-    $(function(){
-        $(window).scroll(function(){
-            clearInterval(timer);
-            var topScroll= getScroll();
-            var topDiv="30px";
-            //设置初始位置
-            var top= topScroll + parseInt(topDiv);
-            timer=setInterval(function(){
-                    $("#coupertcontainer").css("top", top+"px");
-                    $("#coupertcontainer").css("z-index", 999999999999);
-                     // $("#coupertcontainer").animate({"top":top},100);
-            },10)//设置时间
-        })
-    })
+    // $(function(){
+    //     $(window).scroll(function(){
+    //         console.log('position-top',$("#coupertcontainer").position().top);
+    //         console.log('height',$("#coupertcontainer").height());
+    //         console.log('offset-top',$("#coupertcontainer").offset().top);
+    //         // clearInterval(timer);
+    //         var topScroll = getScroll();
+    //         // // var topDiv1 = $("#coupertcontainer").position().top;
+    //         // // alert(topDiv1);
+    //         // var topDiv = "30px";
+    //         // //设置初始位置
+    //         // var top= topScroll + parseInt(topDiv);
+    //         timer = setInterval(function(){
+    //                 $("#coupertcontainer").css("top", topScroll +"px");
+    //                 $("#coupertcontainer").css("z-index", 999999999999);
+    //                  // $("#coupertcontainer").animate({"top":top},100);
+    //         },10)//设置时间
+    //     })
+    // })
     function getScroll(){
              var bodyTop = 0;  
              if (typeof window.pageYOffset != 'undefined') {  

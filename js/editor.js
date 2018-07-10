@@ -12,6 +12,7 @@ var cur_site = null;
 $(function(){
 	chrome.extension.getBackgroundPage().getDomainMMC(tabid,domain).then(function(resp){
 
+			console.log(resp);
 		if(resp.code == 0){
 			data = resp.data;
 			cur_mer = data[0];
@@ -20,7 +21,7 @@ $(function(){
 			var sl_str = "";
 			$(data).each(function(index,item){
 				all_site.push(item.Site);
-				sl_str += "<option value='"+item.Site+"'>"+item.Site+"</option>";
+				sl_str += "<option value='"+item.Site+'-'+item.ID+"'>"+item.Site.toUpperCase()+'-'+item.Name+"</option>";
 			});
 			if(data.length>1){
 				$('#sitetitle').html("Site" + "&nbsp;&nbsp;<span style='color:red'>(Multi)</span>")
@@ -40,9 +41,11 @@ $(function(){
 	});
 
 	$("#site_list").change(function(){
-		var site = $(this).val();
+		var merchantinfo = $(this).val().split('-');
+		var site = merchantinfo[0];
+		var mid = merchantinfo[1];
 		$(data).each(function(index,item){
-			if(item.Site == site){
+			if(item.Site == site && item.ID == mid){
 				cur_mer = item;
 				return false;
 			}
