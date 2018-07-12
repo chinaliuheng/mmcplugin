@@ -43,15 +43,12 @@ $(function() {
                     $('#coupertcontainer').Tdrag();
                     
                     chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-                        if(response.data.length > 0){
-
+                            if(response.data.length > 0){
                             var kw_arr = response.data;
-                            $(kw_arr).each(function(index, item) {
-                                var pattern = '(\\b)' + item + '(\\b)';
-                                console.log(pattern);
-                                $('body').highlightRegex(pattern);
+                            var pattern = '(\\b)' + kw_arr.join('(\\b)|(\\b)') + '(\\b)';
+                            var reg = new RegExp(pattern, 'gi');
+                            $('body').highlightRegex(reg);
 
-                            });
                         }
                     });
                 }
