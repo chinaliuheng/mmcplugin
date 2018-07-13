@@ -164,6 +164,11 @@ $(function(){
 	//landing page check
 	$("#landing_page").focusout(function(){
 		var checkLpInfo = $(this).val();
+
+		if(checkLpInfo.indexOf('?orderby=price') !== -1 || checkLpInfo.indexOf('?sortOrder=lowToHigh') !== -1){
+			checkLpInfo = checkLpInfo.replace('?orderby=price', '');
+			checkLpInfo = checkLpInfo.replace('?sortOrder=lowToHigh', '');
+		}
 		if(checkLpInfo != '' && $("#code").val() == ''){
 			chrome.extension.getBackgroundPage().checkLpInfo(cur_mer_id,cur_site, checkLpInfo).then(function(response){
 				if(response.error == 0) {
@@ -216,7 +221,7 @@ function generateUrl(type){
 		if($("#end_time").val()!=""){
 			url += "expire_type=Fixed&expireDate="+encodeURI($("#end_time").val())+"&";
 		}else{
-			url += "showmerlist=-1&from=couponlist&expire_type=Unknown";
+			url += "showmerlist=-1&from=couponlist&expire_type=Unknown&";
 		}
 		url	+= "description=" + encodeURIComponent($("#desc").val())+"&c_dst_url="+encodeURIComponent($("#landing_page").val());
 	return url;
