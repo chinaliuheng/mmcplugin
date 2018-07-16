@@ -29,6 +29,17 @@ $(function() {
                     return false;
                 }
 
+                // hide plugin
+                chrome.runtime.sendMessage({action:"getIsHide"}, function(response){
+                    var hideplugin = response.data;
+                    if(hideplugin){
+                        $("#coupertcontainer").hide();
+                        return false;
+                    }else{
+                        $("#coupertcontainer").show();
+                    }
+                });
+
                 if ($("#coupertcontainer").length < 1) {
 
 
@@ -57,9 +68,6 @@ $(function() {
         }
 
         if (request.action == 'showPop') {
-
-            // console.log('starting...');
-            // console.log('checking...');
             if ($("#coupertcontainer").length < 1) {
 
                 $('body').after(container);
@@ -80,9 +88,6 @@ $(function() {
             }
 
         }
-
-
-
     });
 
     //for view
@@ -181,15 +186,6 @@ function highlight(element) {
         removeClass(element, higlightClass);
     }, 2000);
 }
-/**
- *
- *  Base64 encode / decode
- *
- *  @author haitao.tu
- *  @date   2010-04-26
- *  @email  tuhaitao@foxmail.com
- *
- */
 
 function Base64() {
 

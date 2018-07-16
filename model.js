@@ -46,10 +46,20 @@ function onUpdated(tabId, details, tab) {
             }
 
         });
+       
     }
 
 }
 
+var hiddenstatus = checkHidden();
+chrome.contextMenus.create({
+    id: "mmchide",
+    type: "checkbox",
+    title: "Hide mmc Plugin",
+    checked: hiddenstatus,
+    contexts: ["all"],
+    onclick: updateHidenStatus
+});
 
 let onCopy = function(info, tab) {
     chrome.tabs.sendMessage(tab.id, { target: "copy" });
@@ -59,8 +69,29 @@ chrome.contextMenus.create({
     id: "copy",
     title: "Copy Current Text",
     contexts: ["all"],
-    "onclick": onCopy
+    onclick: onCopy
 });
+
+
+function checkHidden() {
+    var hidestatus = false;
+    var ishide = cacheWorker('get', 'hideplugin');
+    if(ishide){
+        hidestatus = true;
+    }
+    return hidestatus;
+}
+
+function updateHidenStatus(){
+    var ishide = cacheWorker('get', 'hideplugin');
+    if(ishide){
+       cacheWorker('del', 'hideplugin');
+    }else{
+       cacheWorker('set', 'hideplugin', true);
+    }
+    sendToController('refreshwd',function(resp){});
+    
+}
 
 function checkCache() {
     var cacheList = cacheWorker('get', 'allkeys');
@@ -137,6 +168,7 @@ function get_domain_from_url(url) {
 //监听 controller view 消息
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     var hllock = false;
+    var hidden = false;
     if (request.action == 'needpopAdd') {
         // chrome.tabs.sendMessage(tabId, {action:"popAdd"},function(response) {
         //});
@@ -157,6 +189,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             return true;
         }
     }
+
+    if (request.action == 'getIsHide') {
+        if(hidden === false){
+            hidden = true;
+            var res = checkHidden();
+            sendResponse({data: res});
+        }
+        return true;
+    }    
+
 });
 
 

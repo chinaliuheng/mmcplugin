@@ -12,7 +12,6 @@ var cur_site = null;
 $(function(){
 	chrome.extension.getBackgroundPage().getDomainMMC(tabid,domain).then(function(resp){
 
-			console.log(resp);
 		if(resp.code == 0){
 			data = resp.data;
 			cur_mer = data[0];
