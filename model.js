@@ -55,7 +55,7 @@ var hiddenstatus = checkHidden();
 chrome.contextMenus.create({
     id: "mmchide",
     type: "checkbox",
-    title: "Hide mmc Plugin",
+    title: "Hide MMC Plugin",
     checked: hiddenstatus,
     contexts: ["all"],
     onclick: updateHidenStatus
@@ -205,7 +205,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 //Login
 function Login(user, pass) {
     var apiurl = "https://go.soarinfotech.com/api.php?action=loginCheck";
-    return ajaxApi(apiurl, '', { user: user, password: pass });
+    return ajaxApi(apiurl, '', { user: encodeURIComponent(user), password: encodeURIComponent(pass) });
 }
 
 
