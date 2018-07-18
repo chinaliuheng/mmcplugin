@@ -9,6 +9,7 @@ $(function(){
 			chrome.extension.getBackgroundPage().Login($("#username").val(),$("#password").val()).then(function(resp){
 				if(resp.code==0){
 					var token = resp.data.token;
+					// alert(token);
 					var user = $("#username").val();
 					chrome.extension.getBackgroundPage().cacheWorker('set','user',user);
 					chrome.extension.getBackgroundPage().cacheWorker('set','token',token);
