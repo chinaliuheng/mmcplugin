@@ -9,6 +9,16 @@ function onUpdated(tabId, details, tab) {
         var reload = false;
         var url = tab.url;
 
+        //刷新指定的coupon list 商家页面
+        if(new RegExp("fill=&", 'g').test(url)){
+            var cursite = getQueryString(url, 'site');
+            var curmerchant = getQueryString(url, 'merchant');
+            if(cursite && curmerchant){
+               cacheWorker('set', 'cursite', cursite);
+               cacheWorker('set', 'curmerchant', curmerchant);
+            }
+        }
+
         if(url.indexOf('action=doadd')!=-1 && 'complete' == (details || {}).status){
             setTimeout(function(){
                 chrome.tabs.remove(tabId,function(){});
@@ -22,10 +32,17 @@ function onUpdated(tabId, details, tab) {
                 $(alltabs).each(function(index, tab) {
                     var url_choose = tab.url
                     var tabId_choose = tab.id
-                    if(url_choose.indexOf('coupon_list.php') != -1 && url_choose.indexOf('action=couponlist') != -1 && url_choose.indexOf('from1=mmc') != -1){
-                        chrome.tabs.update(tabId_choose,{highlighted: true});
-                        chrome.tabs.reload(tabId_choose,function(){});
-                        return;            
+                    if(url_choose.indexOf('coupon_list.php') != -1 && url_choose.indexOf('action=couponlist') != -1 && url_choose.indexOf('from1=mmc') != -1 ){
+                        var cursite = cacheWorker('get', 'cursite');
+                        var curmerchant = cacheWorker('get', 'curmerchant');
+                        if(url_choose.indexOf('merchant='+curmerchant) != -1 && url_choose.indexOf('site='+cursite) != -1){
+                            
+                            chrome.tabs.update(tabId_choose,{highlighted: true});
+                            chrome.tabs.reload(tabId_choose,function(){});
+                            cacheWorker('del', 'cursite');
+                            cacheWorker('del', 'curmerchant');
+                            return;            
+                        }
                     }
                 });
             });
@@ -401,6 +418,22 @@ function addedParams() {
     return str;
 }
 
+function getQueryString(str, key) {
+    if(str) {
+        var queryString = str.split('?')[1] || '';
+        var arr = queryString.split('&') || [];
+        for(var i = 0; i<arr.length; i++) {
+            var keyString = decodeURIComponent(arr[i].split('=')[0]);
+            var valueString = decodeURIComponent(arr[i].split('=')[1]);
+            if(key === keyString) {
+                return valueString;
+            }
+        }
+        return;
+    } else {
+        return;
+    }
+}
 
 function cacheWorker(type, key, value = '') {
     if (type == 'set') {

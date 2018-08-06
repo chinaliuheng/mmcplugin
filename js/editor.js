@@ -222,7 +222,7 @@ function generateUrl(type){
 		}else{
 			url += "showmerlist=-1&from=couponlist&expire_type=Unknown&";
 		}
-		url	+= "description=" + encodeURIComponent($("#desc").val())+"&c_dst_url="+encodeURIComponent($("#landing_page").val());
+		url	+= "description=" + encodeURIComponent($("#desc").val())+"&c_dst_url="+ escape($("#landing_page").val());
 	return url;
 }
 
