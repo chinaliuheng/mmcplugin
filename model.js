@@ -5,7 +5,9 @@ var base = new Base64();
 chrome.tabs.onUpdated.addListener(onUpdated);
 
 function onUpdated(tabId, details, tab) {
+
     if ('loading' == (details || {}).status || 'complete' == (details || {}).status) {
+    // if ('loading' == (details || {}).status || 'undefined' == (details || {}).status) {
         var reload = false;
         var url = tab.url;
 
@@ -36,7 +38,7 @@ function onUpdated(tabId, details, tab) {
                         var cursite = cacheWorker('get', 'cursite');
                         var curmerchant = cacheWorker('get', 'curmerchant');
                         if(url_choose.indexOf('merchant='+curmerchant) != -1 && url_choose.indexOf('site='+cursite) != -1){
-                            
+
                             chrome.tabs.update(tabId_choose,{highlighted: true});
                             chrome.tabs.reload(tabId_choose,function(){});
                             cacheWorker('del', 'cursite');

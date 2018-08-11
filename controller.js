@@ -3,9 +3,26 @@ var domain = "";
 var times = 0;
 var hllock = false;
 
+
+// highlight display
+setTimeout(() => {
+    if($('#highlight_words').length==0 && window.location.href.indexOf('soarinfotech') == -1 ){
+        chrome.runtime.sendMessage({action:"getHllist"}, function(response){
+                if(response.data.length > 0){
+                var kw_arr = response.data;
+                var pattern = '(\\b)' + kw_arr.join('(\\b)|(\\b)') + '(\\b)';
+                var reg = new RegExp(pattern, 'gi');
+                $('body').highlightRegex(reg);
+                var highlight = '<input type="hidden" id="highlight_words" />';
+                $('body').append(highlight);
+            }
+        });
+    }
+}, 1000);
+
+
 //监听消息 model + view
 $(function() {
-
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         // alert(window.location.href + window.location.hash);
         var base = new Base64();
@@ -25,7 +42,7 @@ $(function() {
             ch = setInterval(function() {
                 times++;
 
-                if (times > 15) {
+                if (times > 5) {
                     return false;
                 }
 
@@ -53,19 +70,11 @@ $(function() {
                     });
                     $('#coupertcontainer').Tdrag();
                     
-                    chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-                            if(response.data.length > 0){
-                            var kw_arr = response.data;
-                            var pattern = '(\\b)' + kw_arr.join('(\\b)|(\\b)') + '(\\b)';
-                            var reg = new RegExp(pattern, 'gi');
-                            $('body').highlightRegex(reg);
-
-                        }
-                    });
                 }
 
             }, 50);
         }
+
 
         if (request.action == 'showPop') {
             if ($("#coupertcontainer").length < 1) {
