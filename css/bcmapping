@@ -1,0 +1,17 @@
+competitor merchant  <==> bc merchant <==> bu merchant
+	store_domain[domainbeat] -> store[domain]->store_merchant_relation[site+merchantid]->merchant_mapping(toid)
+
+
+bc merchant <==> bu merchant
+1. add merchant 
+	A. bu input [merchantid, name, url]  return:bc merchantid
+		find merchants 
+			1.find: normalmercahnt store 恢复/新增 表：normalmerchant				脚本:/app/site/task_usr/public_html/app/public/api/add_merchant.php 
+			bc merchant [merchant info]
+
+			2.not find: add new merchant 表：store+store_merchant_replation		脚本/app/site/task_usr/public_html/temp/temp_20150401_add_store_from_ms.php
+
+	B. merchant_mapping [base -> sub_bu_base]	bc1: /app/site/task.soarinfotech.com/web/bdg/api_bu_merchant.php
+		
+2. add coupon [bu-> bc]  bc1: /app/site/task.soarinfotech.com/web/bdg/addCoupon_to_bc.php
+	bc->bu[merchant mapping]
