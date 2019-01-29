@@ -6,9 +6,9 @@ var hllock = false;
 
 // highlight display
 setTimeout(() => {
-    if($('#highlight_words').length==0 && window.location.href.indexOf('soarinfotech') == -1 ){
-        chrome.runtime.sendMessage({action:"getHllist"}, function(response){
-                if(response.data.length > 0){
+    if ($('#highlight_words').length == 0 && window.location.href.indexOf('soarinfotech') == -1) {
+        chrome.runtime.sendMessage({ action: "getHllist" }, function(response) {
+            if (response.data.length > 0) {
                 var kw_arr = response.data;
                 var pattern = '(\\b)' + kw_arr.join('(\\b)|(\\b)') + '(\\b)';
                 var reg = new RegExp(pattern, 'gi');
@@ -17,6 +17,46 @@ setTimeout(() => {
                 $('body').append(highlight);
             }
         });
+    }
+
+    if (window.location.href.indexOf('email_content_detail') !== -1) {
+        var emailuniqueid = $('input[name=emailuniqueid]').val();
+        if (emailuniqueid.length>0) {
+            //append landing page
+            chrome.runtime.sendMessage({ action: "getLandingPage", uniqueid: emailuniqueid }, function(response) {
+                // console.log(response);
+                if (response.data) {
+                    $("table[name='matchresult'] td a").each(function(index, el) {
+   
+                        if ($(el).html().indexOf('Add Coupon') !== -1 || $(el).html().indexOf('Add Deal') !== -1 || $(el).html().indexOf('+') !== -1) {
+                            var cururl = $(el).attr('href');
+                            if (cururl.indexOf('c_dst_url') == -1) {
+                                cururl += '&c_dst_url=' + encodeURIComponent(response.data);
+                                $(el).attr('href', cururl);
+                            } 
+                        } 
+                    });
+                }
+            });
+
+            chrome.runtime.sendMessage({ action: "getErrorMatch", uniqueid: emailuniqueid }, function(response) {
+                 if (response.data && response.data.length>0) {
+                    errorMatch = $.parseJSON(response.data); 
+                    $(errorMatch).each(function(index, el) {
+                        console.log(el);
+                        var site = el.site;
+                        var mid = el.ID;
+                        var wrongdomain = el.OriginalUrl;
+                        var tdkey = site + '-' + mid;
+                        log = "system will remove match wrong info : " + site + '-' + mid + "\r"+ wrongdomain +"?";
+                        if (confirm(log)) {
+                            $("td[data-siteinfo='"+ tdkey +"']").remove();
+                            //add remove log
+                        }
+                    });
+                 }
+            });
+        }
     }
 }, 1000);
 
@@ -47,18 +87,17 @@ $(function() {
                 }
 
                 // hide plugin
-                chrome.runtime.sendMessage({action:"getIsHide"}, function(response){
+                chrome.runtime.sendMessage({ action: "getIsHide" }, function(response) {
                     var hideplugin = response.data;
-                    if(hideplugin){
+                    if (hideplugin) {
                         $("#coupertcontainer").hide();
                         return false;
-                    }else{
+                    } else {
                         $("#coupertcontainer").show();
                     }
                 });
 
                 if ($("#coupertcontainer").length < 1) {
-
 
                     $('body').after(container);
                     $("#coupertcontainer").html(ifm);
@@ -69,7 +108,7 @@ $(function() {
                         $("#coupertfrmshow").val('1');
                     });
                     $('#coupertcontainer').Tdrag();
-                    
+
                 }
 
             }, 50);
@@ -95,7 +134,6 @@ $(function() {
                     $("#coupertfrmshow").val('1');
                 }
             }
-
         }
     });
 
@@ -114,8 +152,8 @@ $(function() {
     });
 
     var timer;
-    $(function(){
-        $(window).scroll(function(){
+    $(function() {
+        $(window).scroll(function() {
             // console.log('position-top',$("#coupertcontainer").position().top);
             // console.log('height',$("#coupertcontainer").height());
             // console.log('offset-top',$("#coupertcontainer").offset().top);
@@ -125,28 +163,26 @@ $(function() {
             // // alert(topDiv1);
             var topDiv = "30px";
             // //设置初始位置
-            var top= topScroll + parseInt(topDiv);
-            timer = setInterval(function(){
-                    $("#coupertcontainer").css("top", top +"px");
-                    $("#coupertcontainer").css("z-index", 999999999999);
-                     // $("#coupertcontainer").animate({"top":top},100);
-            },10)//设置时间
+            var top = topScroll + parseInt(topDiv);
+            timer = setInterval(function() {
+                $("#coupertcontainer").css("top", top + "px");
+                $("#coupertcontainer").css("z-index", 999999999999);
+                // $("#coupertcontainer").animate({"top":top},100);
+            }, 10) //设置时间
         })
     })
-    function getScroll(){
-             var bodyTop = 0;  
-             if (typeof window.pageYOffset != 'undefined') {  
-                     bodyTop = window.pageYOffset;  
-             } else if (typeof document.compatMode != 'undefined' && document.compatMode != 'BackCompat') {  
-                     bodyTop = document.documentElement.scrollTop;  
-             }  
-             else if (typeof document.body != 'undefined') {  
-                     bodyTop = document.body.scrollTop;  
-             }  
-             return bodyTop
+
+    function getScroll() {
+        var bodyTop = 0;
+        if (typeof window.pageYOffset != 'undefined') {
+            bodyTop = window.pageYOffset;
+        } else if (typeof document.compatMode != 'undefined' && document.compatMode != 'BackCompat') {
+            bodyTop = document.documentElement.scrollTop;
+        } else if (typeof document.body != 'undefined') {
+            bodyTop = document.body.scrollTop;
+        }
+        return bodyTop
     }
-
-
 });
 
 
@@ -194,6 +230,23 @@ function highlight(element) {
     setTimeout(() => {
         removeClass(element, higlightClass);
     }, 2000);
+}
+
+function getQueryString(str, key) {
+    if (str) {
+        var queryString = str.split('?')[1] || '';
+        var arr = queryString.split('&') || [];
+        for (var i = 0; i < arr.length; i++) {
+            var keyString = decodeURIComponent(arr[i].split('=')[0]);
+            var valueString = decodeURIComponent(arr[i].split('=')[1]);
+            if (key === keyString) {
+                return valueString;
+            }
+        }
+        return;
+    } else {
+        return;
+    }
 }
 
 function Base64() {

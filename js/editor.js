@@ -183,6 +183,43 @@ $(function(){
 			});
 		}
 	});
+
+	// $("#orgprice").focusout(function() {
+	// 	var orginalPrice  = parseInt($('#orgprice').val());
+	// 	var curPrice  = parseInt($('#curprice').val());
+
+	// 	if (orginalPrice > 0 && curPrice > 0) {
+	// 		var num = Math.round((curPrice/orginalPrice) * 100).toString();
+	// 		console.log(num);
+	// 		$("#percent").val(num);
+	// 	} else {
+	// 		alert('please check input');
+	// 	}
+	// });
+
+	$("#orgprice").keyup(function() {
+		var orginalPrice  = parseFloat($('#orgprice').val());
+		var curPrice  = parseFloat($('#curprice').val());
+
+		if (orginalPrice > 0 && curPrice > 0) {
+			var num = Math.round(((orginalPrice-curPrice)/orginalPrice) * 100).toFixed(0);
+			$("#percent").val(num);
+		} else {
+			// alert('please check input');
+		}
+	});
+
+	$("#curprice").keyup(function() {
+		var orginalPrice  = parseFloat($('#orgprice').val());
+		var curPrice  = parseFloat($('#curprice').val());
+
+		if (orginalPrice > 0 && curPrice > 0) {
+			var num = Math.round(((orginalPrice-curPrice)/orginalPrice) * 100).toFixed(0);
+			$("#percent").val(num);
+		} else {
+			// alert('please check input');
+		}
+	});
 });
 
 Date.prototype.format = function(format) { 
@@ -211,6 +248,7 @@ function generateUrl(type){
 	var url = "http://task.soarinfotech.com/editor/promo.php?"
 			+"site="+cur_site+"&"
 			+"action=add&"
+			+"promotiondetail="+ $("#percent").val().toString() +"&"
 			+"type="+type+"&"
 			+"select_source=mmc|Merchant&"
 			+"title="+ encodeURIComponent($("#title").val().toString())+"&"

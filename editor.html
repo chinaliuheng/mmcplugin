@@ -155,7 +155,7 @@
                                 <div class="item-inner">
                                     <div class="item-title label">Code</div>
                                     <div class="item-input">
-                                        <input type="text" placeholder="" class="" id="code" value="" style="width: 100px;"/>
+                                        <input type="text" placeholder="" class="" id="code" value="" autocomplete="off" style="width: 100px;"/>
                                         <span id="checkcouponcode" name="checkcouponcode" style="color: red"></span>
                                     </div>
                                 </div>
@@ -166,10 +166,19 @@
                                 <div class="item-inner">
                                     <div class="item-title label">Title</div>
                                     <div class="item-input">
-                                        <input type="text" placeholder="please input title" id="title">
+                                        <input type="text" placeholder="please input title" id="title" autocomplete="off">
                                         <span id="title_hidden" style="color: red"></span>
                                         <span id="blackmsg" style="color: red"></span>
                                     </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                 <div class="item-inner" style="height: 20px;">
+                                    OrgPrice<input type="text" id="orgprice" style="width:15%; height: 70%; border: 1px solid black;" size="3">
+                                    CurPrice<input type="text" id="curprice" style="width:15%; height: 70%; border: 1px solid black;" size="3">
+                                    %OFF<input type="text" id="percent" style="width:15%; height: 70%; border: 1px solid black;" size="3">
                                 </div>
                             </div>
                         </li>

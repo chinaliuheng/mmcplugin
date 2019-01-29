@@ -7,50 +7,107 @@ chrome.tabs.onUpdated.addListener(onUpdated);
 function onUpdated(tabId, details, tab) {
 
     if ('loading' == (details || {}).status || 'complete' == (details || {}).status) {
-    // if ('loading' == (details || {}).status || 'undefined' == (details || {}).status) {
+        // if ('loading' == (details || {}).status || 'undefined' == (details || {}).status) {
         var reload = false;
         var url = tab.url;
 
+        domain = get_domain_from_url(url);
+        //当前打开的url为邮件后台
+        // if (url.indexOf('email_content_detail') != -1) {
+
+        if ('complete' == (details || {}).status && url.indexOf('chrome://') == -1) {
+            chrome.tabs.executeScript(
+                tab.id,
+                { code: "document.referrer;" },
+                // _=>chrome.runtime.lastError
+                function(result) {
+                    if (result && result.length > 0) {
+                        var referUrl = result[0];
+                        if (referUrl.indexOf('email_content.php') !== -1 && url.indexOf('email_content_detail.php') == -1) {
+
+                            if (referUrl != '' && confirm("Is the page email landingPage?")) {
+                                var emailUniqueid = getQueryString(referUrl, 'EmailUniqueID');
+                                if (emailUniqueid) {
+                                    //获取当前的邮件以及系统匹配的商家
+                                    getEmailMatchInfo(emailUniqueid).then(function(response){
+                                        var id = response.data.ID;
+                                        if (response.data.matchinfo.length>0) {
+                                            var matchWrong = new Array();
+                                            // console.log(typeof(matchResult));
+                                            $(response.data.matchinfo).each(function(index, el) {
+                                                if (url.indexOf(el.preurl) === -1) {
+                                                    matchWrong.push(el);
+                                                } 
+                                            });
+
+                                            if (matchWrong.length>0) {
+                                                cacheWorker('set', 'error_match_' + emailUniqueid, JSON.stringify(matchWrong));
+                                                cacheWorker('set', 'landingpage_' + emailUniqueid, url);
+                                            }
+
+                                            chrome.tabs.getAllInWindow(function(alltabs) {
+                                                $(alltabs).each(function(index, tabitem) {
+                                                    var url_choose = tabitem.url;
+                                                    var tabId_choose = tabitem.id;
+                                                    console.log(tabitem);
+                                                    if (url_choose.indexOf(id) != -1 ) {
+
+                                                        chrome.tabs.update(tabId_choose, { highlighted: true });
+                                                        chrome.tabs.reload(tabId_choose, function() {});
+                                                        return;
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+        }
+
         //刷新指定的coupon list 商家页面
-        if(new RegExp("fill=&", 'g').test(url)){
+        if (new RegExp("fill=&", 'g').test(url)) {
             var cursite = getQueryString(url, 'site');
             var curmerchant = getQueryString(url, 'merchant');
-            if(cursite && curmerchant){
-               cacheWorker('set', 'cursite', cursite);
-               cacheWorker('set', 'curmerchant', curmerchant);
+            if (cursite && curmerchant) {
+                cacheWorker('set', 'cursite', cursite);
+                cacheWorker('set', 'curmerchant', curmerchant);
             }
         }
 
-        if(url.indexOf('action=doadd')!=-1 && 'complete' == (details || {}).status){
-            setTimeout(function(){
-                chrome.tabs.remove(tabId,function(){});
-            },1000);
+        if (url.indexOf('action=doadd') != -1 && 'complete' == (details || {}).status) {
+            setTimeout(function() {
+                chrome.tabs.remove(tabId, function() {});
+            }, 1000);
             reload = true;
             // return;
-        }
+        }        
 
-        if(reload){
-            chrome.tabs.getAllInWindow(function(alltabs){
+        if (reload) {
+            chrome.tabs.getAllInWindow(function(alltabs) {
                 $(alltabs).each(function(index, tab) {
-                    var url_choose = tab.url
-                    var tabId_choose = tab.id
-                    if(url_choose.indexOf('coupon_list.php') != -1 && url_choose.indexOf('action=couponlist') != -1 && url_choose.indexOf('from1=mmc') != -1 ){
+                    var url_choose = tab.url;
+                    var tabId_choose = tab.id;
+                    if (url_choose.indexOf('coupon_list.php') != -1 && url_choose.indexOf('action=couponlist') != -1 && url_choose.indexOf('from1=mmc') != -1) {
                         var cursite = cacheWorker('get', 'cursite');
                         var curmerchant = cacheWorker('get', 'curmerchant');
-                        if(url_choose.indexOf('merchant='+curmerchant) != -1 && url_choose.indexOf('site='+cursite) != -1){
+                        if (url_choose.indexOf('merchant=' + curmerchant) != -1 && url_choose.indexOf('site=' + cursite) != -1) {
 
-                            chrome.tabs.update(tabId_choose,{highlighted: true});
-                            chrome.tabs.reload(tabId_choose,function(){});
+                            chrome.tabs.update(tabId_choose, { highlighted: true });
+                            chrome.tabs.reload(tabId_choose, function() {});
                             cacheWorker('del', 'cursite');
                             cacheWorker('del', 'curmerchant');
-                            return;            
+                            return;
                         }
                     }
                 });
             });
-        }    
+        }
 
-        domain = get_domain_from_url(url);
+        
         if (checkCache()) {
             clearCache();
         }
@@ -65,9 +122,7 @@ function onUpdated(tabId, details, tab) {
             }
 
         });
-       
     }
-
 }
 
 var hiddenstatus = checkHidden();
@@ -91,25 +146,27 @@ chrome.contextMenus.create({
     onclick: onCopy
 });
 
+function getrefer(){
+    return document.referrer;
+}
 
 function checkHidden() {
     var hidestatus = false;
     var ishide = cacheWorker('get', 'hideplugin');
-    if(ishide){
+    if (ishide) {
         hidestatus = true;
     }
     return hidestatus;
 }
 
-function updateHidenStatus(){
+function updateHidenStatus() {
     var ishide = cacheWorker('get', 'hideplugin');
-    if(ishide){
-       cacheWorker('del', 'hideplugin');
-    }else{
-       cacheWorker('set', 'hideplugin', true);
+    if (ishide) {
+        cacheWorker('del', 'hideplugin');
+    } else {
+        cacheWorker('set', 'hideplugin', true);
     }
-    sendToController('refreshwd',function(resp){});
-    
+    sendToController('refreshwd', function(resp) {});
 }
 
 function checkCache() {
@@ -196,11 +253,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if (request.action == 'getHllist') {
-        if(hllock === false){
-            getHighLight('mmc').then(function(res){
-                if(res.code == 0){
-                    sendResponse({data: res.data});
-                }else{
+        if (hllock === false) {
+            getHighLight('mmc').then(function(res) {
+                if (res.code == 0) {
+                    sendResponse({ data: res.data });
+                } else {
                     console.log('no hightlight words');
                 }
                 hllock = true;
@@ -209,14 +266,26 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
     }
 
-    if (request.action == 'getIsHide') {
-        if(hidden === false){
-            hidden = true;
-            var res = checkHidden();
-            sendResponse({data: res});
-        }
+    if (request.action == 'getLandingPage') {
+        var emailiuniqueid = request.uniqueid;
+        sendResponse({ data: cacheWorker('get', 'landingpage_' + emailiuniqueid)});
         return true;
     }    
+
+    if (request.action == 'getErrorMatch') {
+        var emailiuniqueid = request.uniqueid;
+        sendResponse({ data: cacheWorker('get', 'error_match_' + emailiuniqueid)});
+        return true;
+    }
+
+    if (request.action == 'getIsHide') {
+        if (hidden === false) {
+            hidden = true;
+            var res = checkHidden();
+            sendResponse({ data: res });
+        }
+        return true;
+    }
 
 });
 
@@ -226,7 +295,11 @@ function Login(user, pass) {
     var apiurl = "https://go.soarinfotech.com/api.php?action=loginCheck";
     return ajaxApi(apiurl, '', { user: user, password: pass });
 }
-
+//getEmailMatchInfo
+function getEmailMatchInfo(emailuniqueid) {
+    var apiurl = "https://go.soarinfotech.com/api.php?action=getEmailInfo&uniqueid=" + emailuniqueid;
+    return ajaxApi(apiurl);
+}
 
 //getDomainMMC
 function getDomainMMC(tabid, domain) {
@@ -421,13 +494,13 @@ function addedParams() {
 }
 
 function getQueryString(str, key) {
-    if(str) {
+    if (str) {
         var queryString = str.split('?')[1] || '';
         var arr = queryString.split('&') || [];
-        for(var i = 0; i<arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
             var keyString = decodeURIComponent(arr[i].split('=')[0]);
             var valueString = decodeURIComponent(arr[i].split('=')[1]);
-            if(key === keyString) {
+            if (key === keyString) {
                 return valueString;
             }
         }
