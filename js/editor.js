@@ -184,19 +184,6 @@ $(function(){
 		}
 	});
 
-	// $("#orgprice").focusout(function() {
-	// 	var orginalPrice  = parseInt($('#orgprice').val());
-	// 	var curPrice  = parseInt($('#curprice').val());
-
-	// 	if (orginalPrice > 0 && curPrice > 0) {
-	// 		var num = Math.round((curPrice/orginalPrice) * 100).toString();
-	// 		console.log(num);
-	// 		$("#percent").val(num);
-	// 	} else {
-	// 		alert('please check input');
-	// 	}
-	// });
-
 	$("#orgprice").keyup(function() {
 		var orginalPrice  = parseFloat($('#orgprice').val());
 		var curPrice  = parseFloat($('#curprice').val());
