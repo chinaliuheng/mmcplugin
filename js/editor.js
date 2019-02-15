@@ -192,7 +192,7 @@ $(function(){
 			var num = Math.round(((orginalPrice-curPrice)/orginalPrice) * 100).toFixed(0);
 			$("#percent").val(num);
 		} else {
-			// alert('please check input');
+			$("#percent").val('');
 		}
 	});
 
@@ -204,7 +204,7 @@ $(function(){
 			var num = Math.round(((orginalPrice-curPrice)/orginalPrice) * 100).toFixed(0);
 			$("#percent").val(num);
 		} else {
-			// alert('please check input');
+			$("#percent").val('');
 		}
 	});
 });
